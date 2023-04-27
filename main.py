@@ -8,31 +8,40 @@ import barcode
 from barcode import Code128
 from PIL import Image
 from barcode.writer import ImageWriter
+
 import cv2
 import numpy as np
 import imageio
 import io
-# img = Image.open('1.pgm ').convert('L')
-# pixels = ''.join(chr(p) for p in img.getdata() if ord(chr(p)) < 128)
-# code128 = Code128(pixels)
+from stegano import lsb
+from barcode import Code128
+from barcode.writer import ImageWriter
+from PIL import Image
+from pyzbar.pyzbar import decode
 
+def Hide_image():
+    #Создание штрих-кода
+    data = '123456789'
+    code128 = Code128(data, writer=ImageWriter())
+    barcode_img = code128.save('barcode')
 
-img = Image.open("1.pgm")
-# Конвертируем изображение в монохромный формат (если необходимо)
-img = img.convert('L')
+    # Открытие изображения
+    image = Image.open('4.jpg')
 
-# Получаем данные о пикселях в виде последовательности
-pixels = img.getdata()
+    # Запись штрих-кода в скрытый слой изображения
+    encrypted_img = lsb.hide(image, 'barcode.png')
 
-# Преобразуем пиксели в строку чисел
-pixels_str = ''.join(str(p) for p in list(pixels)[:16])
+    # Сохранение скрытого изображения
+    encrypted_img.save('encrypted_image.png')
 
+def decoder():
+    img = Image.open("encrypted_image.png")
 
+    # Извлечение скрытой информации из изображения
+    hidden_data = lsb.reveal(img)
+    img_Dec = Image.open(str(hidden_data))
+    result = decode(img_Dec)
+    for i in result:
+        print(i.data.decode("utf-8"))
 
-###Рабочий код
-
-ean = barcode.get('code128',pixels_str , writer=ImageWriter())
-filename = ean.save('barcode_128')
-
-# ean = barcode.get('code128', '123456789102', writer=ImageWriter())
-# filename = ean.save('barcode_ean13')
+decoder()
