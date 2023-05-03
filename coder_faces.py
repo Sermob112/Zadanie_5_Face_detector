@@ -101,9 +101,7 @@ def Decoder(img):
 
 
     return result
-# print(Decoder("crypt/9338489.png"))
-# print(Decoder("9338489.png"))
-# decoder()
+
 def Haart_casc():
     face_cascade = cv2.CascadeClassifier('cascade/haarcascade_frontalface_default.xml')
     img_rgb = cv2.imread('5.png')
