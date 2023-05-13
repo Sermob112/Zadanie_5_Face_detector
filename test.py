@@ -103,3 +103,27 @@ def Decoder(img):
     return result
 
 # print(Decoder("encrypted_image.png"))
+# import hashlib
+#
+# number = 318650333655351661368655386650194489221473256477282503250508217505424505451480487477514494490510456511269720301704331695353701374694404704438718407745377759354762330760300746284723330723353724375723423721375721353725331722
+#
+# # Шифрование числа
+# hashed_number = hashlib.md5(str(number).encode()).hexdigest()
+#
+# print("Зашифрованное число:", hashed_number)
+#
+# # Восстановление числа
+# restored_number = int(hashed_number, 36)
+#
+# print("Восстановленное число:", restored_number)
+
+from PIL import Image
+
+# Открываем исходное изображение
+image = Image.open('barcodes/barcode9338489.8.jpg.png')
+
+# Изменяем размер изображения
+resized_image = image.resize((200, 180))
+
+# Сохраняем измененное изображение
+resized_image.save('измененное_изображение.jpg')

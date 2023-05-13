@@ -3,6 +3,7 @@ import cv2
 from stegano import lsb
 from barcode import EAN8,Code128
 from barcode.writer import ImageWriter
+import hashlib
 from PIL import Image
 import numpy as np
 import dlib
@@ -12,6 +13,8 @@ import os
 Pictures = []
 barcodes = []
 encrypts = []
+antroposMass = []
+lsbMass= []
 def get_pics():
 
     path = 'Pics'
@@ -42,7 +45,27 @@ def get_encrypted_pics():
         filepath = os.path.join(path, file)
         encrypts.append(filepath)
     return  encrypts
+
+def antoposPoints():
+
+    path = 'antropos'
+    files = os.listdir(path)
+    for file in files:
+
+        filepath = os.path.join(path, file)
+        antroposMass.append(filepath)
+    return  antroposMass
+def get_lsb_layers():
+
+    path = 'LSBPics'
+    files = os.listdir(path)
+    for file in files:
+
+        filepath = os.path.join(path, file)
+        lsbMass.append(filepath)
+    return  lsbMass
 # print(get_encrypted_pics())
+
 def Exctract(pic):
     predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
     image = cv2.imread(pic)
@@ -52,27 +75,34 @@ def Exctract(pic):
     for face in faces:
         landmarks = predictor(gray, face)
         face_points = [(p.x, p.y) for p in landmarks.parts()][31:68]
+
     num = int(''.join([str(x[0]) + str(x[1]) for x in face_points]))
     for face in faces:
         landmarks = predictor(gray, face)
-        for n in range(31, 68):
+        for n in range(0, 68):
             x = landmarks.part(n).x
             y = landmarks.part(n).y
             cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
-            image.save()
+    # cv2.imwrite(f'antropos/{pic}.jpg', image)
+    pil_image = Image.fromarray(image)
+    file_path = pic
+    file_name = os.path.basename(file_path)
+    pil_image.save(f'antropos/{file_name}.jpg')
+    antroposMass.append(f'antropos/{file_name}.jpg')
     return num
-# print(Exctract('4.jpg'))
+
 
 def BarCodeimage(pic):
     data = Exctract(pic)
-    # result = pic.split(".")[0]
+    hashed_number = hashlib.md5(str(data).encode()).hexdigest()
     file_path = pic
     file_name = os.path.basename(file_path)
-    # result = file_name.split(".")[0]
-    code128 = Code128(data, writer=ImageWriter())
-    barcode_img = code128.save(f'barcodes/barcode{file_name}')
+    code128 = Code128(hashed_number, writer=ImageWriter())
+    barcode_img = code128.render()
+    resized_image = barcode_img.resize((180, 180))
+    resized_image.save(f'barcodes/barcode{file_name}')
     barcodes.append(barcode_img)
-    return  barcode_img
+    return  f'barcodes/barcode{file_name}'
 
 
 # def Coder(codpic,barcode ):
@@ -108,10 +138,10 @@ def BarCodeimage(pic):
 #     except Exception:
 #         result.append("Скрытый слой не найден")
 #
-
-    return result
+    #
+    # return result
 class Steganography:
-    def coder(self, cover_file, secret_file, color_plane, pixel_bit):
+    def embed(self, cover_file, secret_file, color_plane, pixel_bit):
         cover_array = self.image_to_matrix(cover_file)
         secret_array = self.image_to_matrix(secret_file)
         mask = 0xff ^ (1 << pixel_bit)
@@ -120,16 +150,29 @@ class Steganography:
         cover_plane = (cover_array[:height,:width,color_plane] & mask) + secret_bits
         cover_array[:height,:width,color_plane] = cover_plane
         stego_image = self.matrix_to_image(cover_array)
-        return stego_image
 
-    def decoder(self, stego_file, color_plane, pixel_bit):
+        file_path = cover_file
+        file_name = os.path.basename(file_path)
+
+        stego_image.save(f'crypt/{file_name}.png')
+        encrypts.append(f"crypt/{file_name}.png")
+        return f"crypt/{file_name}.png"
+
+
+    def extract(self, stego_file, color_plane, pixel_bit):
         stego_array = self.image_to_matrix(stego_file)
         change_index = [0, 1, 2]
         change_index.remove(color_plane)
         stego_array[...,change_index] = 0
         stego_array = ((stego_array >> pixel_bit) & 0x01) << 7
         exposed_secret = self.matrix_to_image(stego_array)
-        return exposed_secret
+
+        file_path = stego_file
+        file_name = os.path.basename(file_path)
+
+        exposed_secret.save(f'LSBPics/{file_name}.jpg')
+        lsbMass.append(f"LSBPics/{file_name}.jpg")
+        return f"LSBPics/{file_name}.jpg"
 
     def image_to_matrix(self, file_path):
         return np.array(Image.open(file_path))
@@ -138,15 +181,6 @@ class Steganography:
         return Image.fromarray(array)
 
 
-plane = 2
-bit = 1
-
-cover_file = "crypt.jpg"
-# secret_file = "barcodes/barcode9338489.12.jpg.png"
-secret_file = "codes.png"
-
-stego_file = "stego.png"
-extracted_file = "extracted.png"
 
 # S = Steganography()
 # S.embed(cover_file, secret_file, plane, bit).save(stego_file)
