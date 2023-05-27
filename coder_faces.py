@@ -82,7 +82,7 @@ def Exctract(pic):
         for n in range(0, 68):
             x = landmarks.part(n).x
             y = landmarks.part(n).y
-            cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
+            cv2.circle(image, (x, y), 10, (0, 0, 255), -1)
     # cv2.imwrite(f'antropos/{pic}.jpg', image)
     pil_image = Image.fromarray(image)
     file_path = pic
@@ -99,7 +99,7 @@ def BarCodeimage(pic):
     file_name = os.path.basename(file_path)
     code128 = Code128(hashed_number, writer=ImageWriter())
     barcode_img = code128.render()
-    resized_image = barcode_img.resize((180, 180))
+    resized_image = barcode_img.resize((720, 720))
     resized_image.save(f'barcodes/barcode{file_name}')
     barcodes.append(barcode_img)
     return  f'barcodes/barcode{file_name}'
@@ -180,8 +180,16 @@ class Steganography:
     def matrix_to_image(self, array):
         return Image.fromarray(array)
 
-
-
+# plane = 2
+# bit = 1
+#
+# cover_file = "crypt/4.jpg.png"
+# # secret_file = "barcodes/barcode9338489.12.jpg.png"
+# secret_file = "barcodes/barcode4.jpg"
+#
+# stego_file = "stego.png"
+# extracted_file = "extracted.png"
+#
 # S = Steganography()
 # S.embed(cover_file, secret_file, plane, bit).save(stego_file)
 # S.extract(stego_file, plane, bit).save(extracted_file)

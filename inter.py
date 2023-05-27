@@ -87,9 +87,7 @@ class Ui_mainWindow(object):
         self.comboBox_lasb = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox_lasb.setGeometry(QtCore.QRect(410, 600, 161, 21))
         self.comboBox_lasb.setObjectName("comboBox_lasb")
-        self.comboBox_lsb2 = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox_lsb2.setGeometry(QtCore.QRect(750, 600, 161, 21))
-        self.comboBox_lsb2.setObjectName("comboBox_lsb2")
+
         mainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(mainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1159, 21))
@@ -184,8 +182,7 @@ class Ui_mainWindow(object):
         self.lsb_layer.setText(_translate("mainWindow", "TextLabel"))
         self.label_7.setText(_translate("mainWindow", "Антропометрические точки лица"))
         self.label_8.setText(_translate("mainWindow", "Lsb слой"))
-        self.lsb_layer_2.setText(_translate("mainWindow", "TextLabel"))
-        self.label_9.setText(_translate("mainWindow", "Lsb слой"))
+
 
     def showPicts(self):
         self.comboBox_2.addItem(BarCodeimage(self.comboBox.currentText()))
